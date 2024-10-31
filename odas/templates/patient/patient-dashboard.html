@@ -1,0 +1,111 @@
+{% extends "patient/base.html" %}
+{% load static %}
+{% block content %}
+<div class="container">
+  <div>
+      {% for message in messages %}
+      <div class="alert alert-warning alert-dismissible fade show alert-bar-doc-dash" role="alert">
+          <strong>{{message}}</strong> Welcome to dashboard!
+          <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+      </div>
+      {% endfor %}
+  </div>
+  <section class="top-dashboard-bar mt-4">
+    <div>
+      <h1 class="dashboard-patient">
+      {{patient.first_name}} {{patient.last_name}} 
+      </h1>
+    
+      <h3 class="mb-5">Welcome To Your DashBoard</h3>
+    </div>
+    <div>
+      <a class="dashboard-refresh btn btn-lg btn-success" href="{% url 'pd' %}">
+        <i class="fa-solid fa-arrows-rotate"></i>
+      </a>
+    </div>
+  </section>
+
+  <section class="doc-search mb-4">
+    <form method="POST">
+      {% csrf_token %}
+      <input type="text" placeholder="Search by doctor's name or speciality" name="keyword">
+      <button type="submit"><i class="fa fa-solid fa-magnifying-glass"></i></button>
+    </form>
+  </section>
+  <h3 class = "text-center">Available Doctors</h3>
+  <hr>
+  <div class="d-flex justify-content-center mb-5" style="flex-wrap: wrap; gap: 1rem;">
+    {% if not doctors %}
+    <h4>No doctors found</h4>
+    {% endif %}
+    {% for doctor in doctors %}
+    <div class="card border-dark pat-dash-card" style="width: 18rem; margin:5px;">
+      <div class="card-body">
+
+        <!-- image section -->
+        <div class="d-flex justify-content-center">
+        {% if doctor.img %}
+        
+          <img src="{{doctor.img.url}}" alt="Not Found" width="100px", height="100px" style="border-radius: 50%;">
+        
+        {% else %}
+          {% if doctor.gender == "Female" %}
+          <img src="{% static 'doctor/imgs/avatar/female-doc.jpg' %}" alt="Not Found" width="100px", height="100px" style="border-radius: 50%;">
+
+          {% else %}
+          <img src="{% static 'doctor/imgs/avatar/male-doc.png' %}" alt="Not Found" width="100px", height="100px" style="border-radius: 50%;">
+
+          {% endif %}
+
+        {% endif %}
+        </div>
+
+        <h5 class="card-title text-center">Dr. {{doctor.first_name}} {{doctor.last_name}}</h5>
+        <h6 class="card-subtitle mb-2 text-muted text-center">{{doctor.speciality}}</h6>
+        <p style="margin-top: 15px; margin-bottom:0px; padding:0px;">Availability</p>
+        <hr style=" margin:4px; padding:0px;">
+
+        <!-- selectively show available days -->
+        <div style="justify-content: center; align-items:center;">
+          {% if doctor.sun_start %}
+          <span class="btn btn-success btn-sm">Sun</span>
+          {% endif %}
+          {% if doctor.mon_start %}
+          <span class="btn btn-success btn-sm">Mon</span>
+          {% endif %}
+          {% if doctor.tue_start %}
+          <span class="btn btn-success btn-sm">Tue</span>
+          {% endif %}
+          {% if doctor.wed_start %}
+          <span class="btn btn-success btn-sm">Wed</span>
+          {% endif %}
+          {% if doctor.thu_start %}
+          <span class="btn btn-success btn-sm">Thu</span>
+          {% endif %}
+          {% if doctor.fri_start %}
+          <span class="btn btn-success btn-sm">Fri</span>
+          {% endif %}
+          {% if doctor.sat_start %}
+          <span class="btn btn-success btn-sm">Sat</span>
+          {% endif %}
+        </div>
+
+        <h6 class="mt-4 text-muted">Charges: <b class="text-dark">Rs. {{doctor.charge}}</b></h6>
+          <button type="button" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#payment-for-{{doctor.id}}">
+            Book Appointment
+          </button>
+
+          {% include 'patient/appointment-modal.html' %}
+
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+
+</div>
+
+
+
+
+
+{% endblock %}
